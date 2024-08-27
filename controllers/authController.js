@@ -1,4 +1,5 @@
-const { hash } = require("bcrypt");
+const { hash, compare } = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user.js");
 
 exports.register = async function (req, res, next) {
@@ -7,12 +8,12 @@ exports.register = async function (req, res, next) {
 
         // use schema to validate
         if (!name) {
-            res.status(422).json({ message: "A name is required.", error: {} });
+            res.status(422).send({ message: "A name is required.", error: {} });
             return;
         }
 
         if (!email || !password) {
-            res.status(422).json({
+            res.status(422).send({
                 message: "Email and password are required!",
                 error: {},
             });
@@ -51,4 +52,43 @@ exports.register = async function (req, res, next) {
     }
 };
 
-// export
+exports.login = async function (req, res, next) {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            return res.status(401).send({
+                message: "email or password incorrect.",
+                error: {},
+            });
+        }
+
+        const isPasswordValid = await compare(password, user.passwordHash);
+        if (!isPasswordValid) {
+            return res.status(401).send({
+                message: "email or password incorrect.",
+                error: {},
+            });
+        }
+		
+		// todo: place this in utils/
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        return res.status(200).send({
+            message: "Login successful",
+            token: token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
