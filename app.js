@@ -3,11 +3,14 @@ const express = require("express");
 const logger = require("morgan");
 const db = require("./db");
 const errorHandler = require("./middleware/errorHandler.js");
-const PORT = process.env.PORT;
+const indexRouter = require("./routes/index.js");
 
 const app = express();
 app.use(logger("dev"));
 app.use(express.json());
+
+// Define routes before the 404 handler
+app.use("/", indexRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -19,6 +22,7 @@ app.use((req, res, next) => {
 // Error handler middleware
 app.use(errorHandler);
 
+const PORT = process.env.PORT;
 db.connect()
     .then(() => {
         app.listen(PORT, () => {
