@@ -38,5 +38,10 @@ db.connect()
     });
 
 // !: 28th Aug 2024
+// - implement middleware to check that user is authorised
 // - implement middleware to get userId from JWT
 // - implement todo list functionality
+// - implement pagination, sorting, and filtering
+// - add unit tests
+// - add rate limiting
+// - implement refresh tokens
