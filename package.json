@@ -1,0 +1,23 @@
+{
+    "name": "todo-list",
+    "module": "app.js",
+    "type": "commonjs",
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon app.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "http-errors": "^2.0.0",
+        "mongoose": "^8.5.4",
+        "morgan": "^1.10.0",
+        "nodemon": "^3.1.4"
+    }
+}
