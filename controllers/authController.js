@@ -45,7 +45,8 @@ exports.register = async function (req, res, next) {
 
         await user.save();
         console.log("User created.");
-        res.send(user.dto);
+        const token = createToken(user._id, user.email);
+        res.send({ token });
         return;
     } catch (error) {
         next(error);
@@ -71,24 +72,20 @@ exports.login = async function (req, res, next) {
                 error: {},
             });
         }
-		
-		// todo: place this in utils/
-        const token = jwt.sign(
-            { id: user._id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
 
-        return res.status(200).send({
-            message: "Login successful",
-            token: token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-            },
-        });
+        // todo: place this in utils/
+        const token = createToken(user._id, user.email);
+        return res.status(200).send({ token });
     } catch (error) {
         next(error);
     }
 };
+
+function createToken(userId, email) {
+    const token = jwt.sign(
+        { id: userId, email: email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    );
+    return token;
+}
