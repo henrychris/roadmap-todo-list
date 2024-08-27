@@ -36,3 +36,7 @@ db.connect()
         console.error("Failed to connect to database:", err);
         process.exit(1);
     });
+
+// !: 28th Aug 2024
+// - implement middleware to get userId from JWT
+// - implement todo list functionality
