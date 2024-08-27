@@ -3,7 +3,9 @@ const express = require("express");
 const logger = require("morgan");
 const db = require("./db");
 const errorHandler = require("./middleware/errorHandler.js");
+
 const indexRouter = require("./routes/index.js");
+const authRouter = require("./routes/auth.js");
 
 const app = express();
 app.use(logger("dev"));
@@ -11,6 +13,7 @@ app.use(express.json());
 
 // Define routes before the 404 handler
 app.use("/", indexRouter);
+app.use("/auth", authRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
