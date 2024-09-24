@@ -12,21 +12,21 @@ function jwtValidator(req, res, next) {
 
             // Attach user data to the request object
             req.isAuthorised = true;
-            req.id = decoded.id;
+            req.userId = decoded.id;
             req.email = decoded.email;
 
             next();
         } catch (error) {
             console.error("Token verification failed:", error.message);
             res.status(401).json({
-                message: "Invalid or expired token.",
+                message: "Unauthorized",
                 error: {},
             });
         }
     } else {
         console.error("Authorization header missing or malformed");
         res.status(401).json({
-            message: "Access denied. No token provided.",
+            message: "Unauthorized",
             error: {},
         });
     }
