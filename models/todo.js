@@ -4,6 +4,8 @@ const Schema = mongoose.Schema;
 const TodoSchema = new Schema(
     {
         title: { type: String, required: true },
+        description: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     },
     { timestamps: true }
 );
@@ -12,8 +14,7 @@ TodoSchema.virtual("dto").get(function () {
     return {
         id: this._id,
         title: this.title,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt,
+        description: this.description,
     };
 });
 
