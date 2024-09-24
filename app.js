@@ -1,8 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const logger = require("morgan");
-const db = require("./db");
 const { PORT } = require("./config.js");
+
+const express = require("express");
+const db = require("./db");
+
+const logger = require("morgan");
 const errorHandler = require("./middleware/errorHandler.js");
 
 const indexRouter = require("./routes/index.js");
