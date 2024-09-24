@@ -98,8 +98,11 @@ exports.refreshToken = async function (req, res, next) {
 
         let { userId, email } = validateRefreshToken(refreshToken);
         const token = createToken(userId, email);
+        const newRefreshToken = createRefreshToken(userId, email);
+        // in a production application, we'd want to revoke the old token.
+        // obviously, this is not a production app :)
 
-        res.status(200).send({ token });
+        res.status(200).send({ token, newRefreshToken });
         return;
     } catch (error) {
         next(error);
