@@ -54,7 +54,7 @@ exports.login = async function (req, res, next) {
         const user = await User.findOne({ email: email });
 
         if (!user) {
-            return res.status(401).send({
+            return res.status(404).send({
                 message: "email or password incorrect.",
                 error: {},
             });
@@ -62,7 +62,7 @@ exports.login = async function (req, res, next) {
 
         const isPasswordValid = await compare(password, user.passwordHash);
         if (!isPasswordValid) {
-            return res.status(401).send({
+            return res.status(404).send({
                 message: "email or password incorrect.",
                 error: {},
             });
