@@ -7,6 +7,7 @@ const errorHandler = require("./middleware/errorHandler.js");
 
 const indexRouter = require("./routes/index.js");
 const authRouter = require("./routes/auth.js");
+const todoRouter = require("./routes/todo.js");
 
 const app = express();
 app.use(logger("dev"));
@@ -15,6 +16,7 @@ app.use(express.json());
 // Define routes before the 404 handler
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
+app.use("/todo", todoRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
