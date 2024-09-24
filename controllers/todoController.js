@@ -19,9 +19,7 @@ exports.create = async function (req, res, next) {
             user: req.userId,
         });
 
-        await todo.validate();
         await todo.save();
-
         console.log("Todo created.");
         res.status(200).send(todo.dto);
     } catch (error) {
@@ -53,9 +51,16 @@ exports.getById = async function (req, res, next) {
 exports.getAll = async function (req, res, next) {
     try {
         const pageOptions = {
-            pageNo: parseInt(req.query.pageNo, 10) || 0,
+            pageNo: parseInt(req.query.pageNo, 10) || 1,
             pageSize: parseInt(req.query.pageSize, 10) || 10,
         };
+
+        // ensure non-negative page number and page size
+        pageOptions.pageNo = Math.max(pageOptions.pageNo, 1);
+        pageOptions.pageSize = Math.max(pageOptions.pageSize, 1);
+
+        // calculate the total number of todos for this user
+        const totalCount = await Todo.countDocuments({ user: req.userId });
 
         const todos = await Todo.find({
             user: req.userId,
@@ -69,7 +74,7 @@ exports.getAll = async function (req, res, next) {
             data: todos.map((x) => x.dto),
             page: pageOptions.pageNo,
             limit: pageOptions.pageSize,
-            total: todos.length,
+            total: totalCount,
         });
     } catch (error) {
         next(error);
