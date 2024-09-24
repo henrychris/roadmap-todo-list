@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const db = require("./db");
+const { PORT } = require("./config.js");
 const errorHandler = require("./middleware/errorHandler.js");
 
 const indexRouter = require("./routes/index.js");
@@ -25,7 +26,6 @@ app.use((req, res, next) => {
 // Error handler middleware
 app.use(errorHandler);
 
-const PORT = process.env.PORT;
 db.connect()
     .then(() => {
         app.listen(PORT, () => {
