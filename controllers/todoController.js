@@ -16,7 +16,7 @@ exports.create = async function (req, res, next) {
         const todo = new Todo({
             title: title,
             description: description,
-            userId: req.userId,
+            user: req.userId,
         });
 
         await todo.validate();
@@ -34,8 +34,8 @@ exports.getById = async function (req, res, next) {
         const id = req.params.id;
         const todo = await Todo.findOne({
             _id: id,
-            userId: req.userId,
-        }).populate("userId");
+            user: req.userId,
+        }).populate("user");
 
         if (!todo) {
             return res.status(404).send({
@@ -57,7 +57,7 @@ exports.update = async function (req, res, next) {
 
         const todo = await Todo.findOne({
             _id: id,
-        }).populate("userId");
+        }).populate("user");
 
         if (!todo) {
             return res.status(404).send({
@@ -66,7 +66,7 @@ exports.update = async function (req, res, next) {
             });
         }
 
-        if (todo.userId._id.toString() !== req.userId) {
+        if (todo.user._id.toString() !== req.userId) {
             return res.status(403).send({
                 message: "Unauthorised.",
                 error: {},
@@ -88,8 +88,8 @@ exports.delete = async function (req, res, next) {
         const id = req.params.id;
         const toDo = await Todo.findOne({
             _id: id,
-            userId: req.userId,
-        }).populate("userId");
+            user: req.userId,
+        }).populate("user");
 
         if (!toDo) {
             return res.status(404).send({
