@@ -16,7 +16,7 @@ app.use(express.json());
 // Define routes before the 404 handler
 app.use("/", indexRouter);
 app.use("/auth", authRouter);
-app.use("/todo", todoRouter);
+app.use("/todos", todoRouter);
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
