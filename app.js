@@ -40,8 +40,7 @@ db.connect()
     });
 
 // !: 28th Aug 2024
-// - implement todo list functionality
-// - implement pagination, sorting, and filtering
+// - implement pagination, sorting, and filtering on get-all method
 // - add unit tests
 // - add rate limiting
 // - implement refresh tokens
