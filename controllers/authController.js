@@ -1,5 +1,9 @@
 const { hash, compare } = require("bcrypt");
-const { createToken } = require("../utils/token.js");
+const {
+    createToken,
+    createRefreshToken,
+    validateRefreshToken,
+} = require("../utils/token.js");
 const User = require("../models/user.js");
 
 exports.register = async function (req, res, next) {
@@ -41,7 +45,8 @@ exports.register = async function (req, res, next) {
         console.log("User created.");
 
         const token = createToken(user._id, user.email);
-        res.send({ token });
+        const refreshToken = createRefreshToken(user._id, user.email);
+        res.status(200).send({ token, refreshToken });
         return;
     } catch (error) {
         next(error);
@@ -54,22 +59,48 @@ exports.login = async function (req, res, next) {
         const user = await User.findOne({ email: email });
 
         if (!user) {
-            return res.status(404).send({
+            res.status(400).send({
                 message: "email or password incorrect.",
                 error: {},
             });
+            return;
         }
 
         const isPasswordValid = await compare(password, user.passwordHash);
         if (!isPasswordValid) {
-            return res.status(404).send({
+            res.status(400).send({
                 message: "email or password incorrect.",
                 error: {},
             });
+            return;
         }
 
         const token = createToken(user._id, user.email);
-        return res.status(200).send({ token });
+        const refreshToken = createRefreshToken(user._id, user.email);
+        res.status(200).send({ token, refreshToken });
+        return;
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.refreshToken = async function (req, res, next) {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            console.error("Refresh token not provided.");
+            res.status(400).send({
+                message: "Please provide a refresh token",
+                errors: {},
+            });
+            return;
+        }
+
+        let { userId, email } = validateRefreshToken(refreshToken);
+        const token = createToken(userId, email);
+
+        res.status(200).send({ token });
+        return;
     } catch (error) {
         next(error);
     }

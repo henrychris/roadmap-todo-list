@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post("/register", authController.register);
 router.post("/login", limiter, authController.login);
+router.post("/refresh", authController.refreshToken);
 
 module.exports = router;
