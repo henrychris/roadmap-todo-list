@@ -7,7 +7,7 @@ exports.create = async function (req, res, next) {
 
         const user = await User.findOne({ email: req.email });
         if (!user) {
-            return res.status(401).send({
+            return res.status(404).send({
                 message: "user not found.",
                 error: {},
             });
@@ -31,7 +31,20 @@ exports.create = async function (req, res, next) {
 
 exports.getById = async function (req, res, next) {
     try {
-        res.status(200).send("todo get");
+        const id = req.params.id;
+        const todo = await Todo.findOne({
+            _id: id,
+            userId: req.userId,
+        }).populate("userId");
+
+        if (!todo) {
+            return res.status(404).send({
+                message: "todo not found.",
+                error: {},
+            });
+        }
+
+        res.status(200).send(todo.dto);
     } catch (error) {
         next(error);
     }
