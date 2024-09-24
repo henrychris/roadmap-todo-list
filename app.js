@@ -40,7 +40,6 @@ db.connect()
     });
 
 // !: 28th Aug 2024
-// - implement pagination, sorting, and filtering on get-all method
 // - add unit tests
 // - add rate limiting
 // - implement refresh tokens

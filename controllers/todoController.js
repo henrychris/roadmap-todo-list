@@ -50,36 +50,85 @@ exports.getById = async function (req, res, next) {
 
 exports.getAll = async function (req, res, next) {
     try {
-        const pageOptions = {
-            pageNo: parseInt(req.query.pageNo, 10) || 1,
-            pageSize: parseInt(req.query.pageSize, 10) || 10,
-        };
-
-        // ensure non-negative page number and page size
-        pageOptions.pageNo = Math.max(pageOptions.pageNo, 1);
-        pageOptions.pageSize = Math.max(pageOptions.pageSize, 1);
+        const { pageNo, pageSize } = getPaginationOptions(req.query);
+        const sort = getSortOption(req.query);
+        const filters = getFilters(req.userId, req.query);
 
         // calculate the total number of todos for this user
         const totalCount = await Todo.countDocuments({ user: req.userId });
 
+        // todo: finish filtering & test sorting
         const todos = await Todo.find({
-            user: req.userId,
+            ...filters,
         })
             .populate("user")
-            .limit(pageOptions.pageSize)
-            .skip((pageOptions.pageNo - 1) * pageOptions.pageSize)
-            .sort({ createdAt: -1 });
+            .limit(pageSize)
+            .skip((pageNo - 1) * pageSize)
+            .sort(sort);
 
         res.status(200).send({
             data: todos.map((x) => x.dto),
-            page: pageOptions.pageNo,
-            limit: pageOptions.pageSize,
+            page: pageNo,
+            limit: pageSize,
             total: totalCount,
         });
     } catch (error) {
         next(error);
     }
 };
+
+function getPaginationOptions(query) {
+    // paging setup
+    const pageOptions = {
+        pageNo: parseInt(query.pageNo, 10) || 1,
+        pageSize: parseInt(query.pageSize, 10) || 10,
+    };
+
+    // ensure non-negative page number and page size
+    pageOptions.pageNo = Math.max(pageOptions.pageNo, 1);
+    pageOptions.pageSize = Math.max(pageOptions.pageSize, 1);
+
+    return pageOptions;
+}
+
+function getSortOption(query) {
+    const sortOptions = {
+        createdAsc: { createdAt: 1 },
+        createdDesc: { createdAt: -1 },
+        titleAsc: { title: 1 },
+        titleDesc: { title: -1 },
+    };
+
+    const sortBy = query.sort || "createdDesc";
+    const sort = sortOptions[sortBy] || sortOptions.createdDesc;
+    console.log(`sort: ${sortBy}`);
+
+    return sort;
+}
+
+function getFilters(userId, query) {
+    const filters = { user: userId };
+
+    if (query.createdFrom || query.createdTo) {
+        filters.createdAt = {};
+        if (query.createdFrom) {
+            filters.createdAt.$gte = new Date(query.createdFrom);
+        }
+        if (query.createdTo) {
+            filters.createdAt.$lte = new Date(query.createdTo);
+        }
+    }
+
+    if (query.title) {
+        filters.title = { $regex: query.title, $options: "i" }; // Case-insensitive filtering
+    }
+
+    if (query.description) {
+        filters.description = { $regex: query.description, $options: "i" }; // Case-insensitive filtering
+    }
+
+    return filters;
+}
 
 exports.update = async function (req, res, next) {
     try {
@@ -104,8 +153,8 @@ exports.update = async function (req, res, next) {
             });
         }
 
-        todo.title = title ?? todo.title;
-        todo.description = description ?? todo.description;
+        todo.title = title || todo.title;
+        todo.description = description || todo.description;
 
         await todo.save();
         res.status(200).send(todo.dto);
