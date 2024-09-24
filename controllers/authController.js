@@ -36,13 +36,7 @@ exports.register = async function (req, res, next) {
             passwordHash,
         });
 
-        const error = await user.validate();
-        if (error) {
-            console.error(error);
-            res.status(422).send({ message: error, error: {} });
-            return;
-        }
-
+        await user.validate();
         await user.save();
         console.log("User created.");
 
