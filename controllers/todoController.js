@@ -50,6 +50,32 @@ exports.getById = async function (req, res, next) {
     }
 };
 
+exports.getAll = async function (req, res, next) {
+    try {
+        const pageOptions = {
+            pageNo: parseInt(req.query.pageNo, 10) || 0,
+            pageSize: parseInt(req.query.pageSize, 10) || 10,
+        };
+
+        const todos = await Todo.find({
+            user: req.userId,
+        })
+            .populate("user")
+            .limit(pageOptions.pageSize)
+            .skip((pageOptions.pageNo - 1) * pageOptions.pageSize)
+            .sort({ createdAt: -1 });
+
+        res.status(200).send({
+            data: todos.map((x) => x.dto),
+            page: pageOptions.pageNo,
+            limit: pageOptions.pageSize,
+            total: todos.length,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.update = async function (req, res, next) {
     try {
         const id = req.params.id;

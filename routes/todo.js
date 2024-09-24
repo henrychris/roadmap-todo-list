@@ -6,6 +6,7 @@ const router = express.Router();
 router.use(jwtValidator);
 
 router.post("/", todoController.create);
+router.get("/", todoController.getAll);
 router.get("/:id", todoController.getById);
 router.put("/:id", todoController.update);
 router.delete("/:id", todoController.delete);
